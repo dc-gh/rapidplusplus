@@ -126,15 +126,33 @@ const std::string xml_string = R"(
 
 int main()
 {
-  XML::Document docu(xml_string);
-  const auto books = docu.RootElement().Children("book");
-  assert(books.size() == 12);
+  {
+    XML::Document docu(xml_string);
+    const auto books = docu.RootElement().Children("book");
+    assert(books.size() == 12);
 
-  assert(books[0].IsValid());
-  const auto attributes = books[0].Attributes();
-  assert(attributes.size() == 1);
-  assert(attributes[0].Name() == "id");
-  assert(attributes[0].Value() == "bk101");
+    assert(books[0].IsValid());
+    const auto attributes = books[0].Attributes();
+    assert(attributes.size() == 1);
+    assert(attributes[0].Name() == "id");
+    assert(attributes[0].Value() == "bk101");
+  }
+
+  {
+    XML::Document docu;
+    docu.AddDeclaration();
+    XML::Element root_node("catalog");
+    docu.AddRootElement(root_node);
+
+    XML::Element book("book");
+    root_node.AppendElement(book);
+    XML::Attribute book_id("id", "bk101");
+    book.AppendAttribute(book_id);
+    XML::Element author("author", "Galos, Mike");
+    book.AppendElement(author);
+
+    std::cout << docu.ToString();
+  }
 
   std::cout << "Finished!\n";
 

@@ -148,7 +148,7 @@ namespace XML
         assert(IsValid());
         return;
       }
-      
+
       auto document = m_document.lock();
       assert(document != nullptr);
 
@@ -351,11 +351,39 @@ namespace XML
     {
       return m_declaration;
     }
+    
+    void AddDeclaration(std::string version = std::string("1.0"), std::string encoding = std::string("utf-8"), std::string standalone = std::string())
+    {
+      rapidxml::xml_node<>* declaration = m_document->allocate_node(rapidxml::node_declaration, "xml", nullptr);
+
+      if (version.length())
+      {
+        char* v = m_document->allocate_string(version.c_str(), version.length() + 1);
+        declaration->append_attribute(m_document->allocate_attribute("version", v));
+      }
+
+      if (encoding.length())
+      {
+        char* e = m_document->allocate_string(encoding.c_str(), encoding.length() + 1);
+        declaration->append_attribute(m_document->allocate_attribute("encoding", e));
+      }
+      
+      if (standalone.length())
+      {
+        char* s = m_document->allocate_string(standalone.c_str(), standalone.length() + 1);
+        declaration->append_attribute(m_document->allocate_attribute("standalone", s));
+      }
+
+      m_document->append_node(declaration);
+
+      m_declaration.m_document = m_document;
+      m_declaration.m_xml_node = declaration;
+    }
 
     std::string ToString() const
     {
       std::string s;
-      // rapidxml::print(std::back_inserter(s), *m_document.get(), 0);
+      rapidxml::print(std::back_inserter(s), *m_document.get(), 0);
       return s;
     }
 
